@@ -1,133 +1,45 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kişisel TV Sayfam</title>
-  <style>
-    body {
-      margin: 0;
-      background: #000;
-      color: #fff;
-      font-family: sans-serif;
-    }
-    #player-container {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16/9;
-      background: #000;
-    }
-    video {
-      width: 100%;
-      height: 100%;
-      background: #000;
-    }
-    #menu {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      background: #111;
-      padding: 10px;
-    }
-    .channel {
-      margin: 5px;
-      padding: 10px;
-      background: #333;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .hidden {
-      display: none;
-    }
-    #overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 2;
-    }
-    #left, #right {
-      position: absolute;
-      top: 0;
-      height: 100%;
-      width: 50%;
-      z-index: 3;
-    }
-    #left { left: 0; }
-    #right { right: 0; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canlı TV Player</title>
+
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="player-container">
-  <video id="video" controls autoplay></video>
-  <div id="overlay" onclick="toggleMenu()"></div>
-  <div id="left" onclick="prevChannel()"></div>
-  <div id="right" onclick="nextChannel()"></div>
-</div>
-<div id="menu"></div>
+    <div class="player-wrapper">
+        <video
+            id="my-video"
+            class="video-js vjs-default-skin vjs-big-play-centered"
+            controls
+            preload="auto"
+            data-setup='{}'
+        >
+            <p class="vjs-no-js">
+                Videoyu izlemek için lütfen JavaScript'i etkinleştirin ve HTML5 videoyu destekleyen bir tarayıcı kullanın.
+            </p>
+        </video>
 
-<script>
-  let channels = [];
-  let currentIndex = 0;
-  const video = document.getElementById("video");
-  const menu = document.getElementById("menu");
-  const container = document.getElementById("player-container");
+        <div class="player-overlay">
+            <div id="player-left-zone" class="player-zone left-zone"></div>
+            <div id="player-right-zone" class="player-zone right-zone"></div>
+            <div id="player-center-zone" class="player-zone center-zone"></div>
+        </div>
 
-  fetch("channel.txt")
-    .then(res => res.text())
-    .then(data => {
-      const lines = data.split("\n").filter(line => line.includes(".m3u8"));
-      channels = lines;
-      loadChannels();
-      playChannel(0);
-    });
+        <aside id="channel-menu" class="channel-menu">
+            <h2>Kanallar</h2>
+            <ul id="channel-list">
+                </ul>
+        </aside>
+    </div>
 
-  function loadChannels() {
-    menu.innerHTML = "";
-    channels.forEach((url, index) => {
-      const div = document.createElement("div");
-      div.className = "channel";
-      div.innerText = `Kanal ${index + 1}`;
-      div.onclick = () => {
-        playChannel(index);
-        enterFullscreen();
-      };
-      menu.appendChild(div);
-    });
-  }
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+    <script src="https://unpkg.com/@videojs/http-streaming/dist/videojs-http-streaming.min.js"></script>
 
-  function playChannel(index) {
-    currentIndex = index;
-    video.src = channels[index];
-    video.play();
-  }
-
-  function toggleMenu() {
-    menu.classList.toggle("hidden");
-  }
-
-  function enterFullscreen() {
-    if (container.requestFullscreen) {
-      container.requestFullscreen();
-    } else if (container.webkitRequestFullscreen) {
-      container.webkitRequestFullscreen();
-    } else if (container.msRequestFullscreen) {
-      container.msRequestFullscreen();
-    }
-    menu.classList.add("hidden");
-  }
-
-  function nextChannel() {
-    currentIndex = (currentIndex + 1) % channels.length;
-    playChannel(currentIndex);
-  }
-
-  function prevChannel() {
-    currentIndex = (currentIndex - 1 + channels.length) % channels.length;
-    playChannel(currentIndex);
-  }
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>
