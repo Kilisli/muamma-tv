@@ -1,45 +1,33 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canlı TV Player</title>
-
-    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>M3U8 Player</title>
+  <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-    <div class="player-wrapper">
-        <video
-            id="my-video"
-            class="video-js vjs-default-skin vjs-big-play-centered"
-            controls
-            preload="auto"
-            data-setup='{}'
-        >
-            <p class="vjs-no-js">
-                Videoyu izlemek için lütfen JavaScript'i etkinleştirin ve HTML5 videoyu destekleyen bir tarayıcı kullanın.
-            </p>
-        </video>
+  <div class="player-wrapper">
+    <!-- Video Player -->
+    <video id="my-video" class="video-js vjs-default-skin" controls></video>
 
-        <div class="player-overlay">
-            <div id="player-left-zone" class="player-zone left-zone"></div>
-            <div id="player-right-zone" class="player-zone right-zone"></div>
-            <div id="player-center-zone" class="player-zone center-zone"></div>
-        </div>
-
-        <aside id="channel-menu" class="channel-menu">
-            <h2>Kanallar</h2>
-            <ul id="channel-list">
-                </ul>
-        </aside>
+    <!-- Tıklanabilir Overlay Bölgeleri -->
+    <div class="player-overlay">
+      <div id="player-left-zone" class="player-zone left-zone"></div>
+      <div id="player-center-zone" class="player-zone center-zone"></div>
+      <div id="player-right-zone" class="player-zone right-zone"></div>
     </div>
 
-    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
-    <script src="https://unpkg.com/@videojs/http-streaming/dist/videojs-http-streaming.min.js"></script>
+    <!-- Kanal Menüsü -->
+    <div id="channel-menu" class="channel-menu">
+      <h2>Kanallar</h2>
+      <ul id="channel-list"></ul>
+    </div>
+  </div>
 
-    <script src="script.js"></script>
+  <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
