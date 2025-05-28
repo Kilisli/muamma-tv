@@ -1,90 +1,60 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-	<title>Youtube den canlı yayın JSON AJAX jQuery</title>
-	<meta charset="utf-8">
+<%
+	chanel = "UCBgTP2LOFVPmq15W-RH-WXA" 'TRT1 kanal ID'si istediğiniz bir kanalın ID'si ile değiştirin
+	apiKey = "AIzaSyBiGDn6FXr4qR0zh_UoZ4JFjWWReKXWfLQ" 'Google'dan aldığınız API kimliği
 	
-	<script src="http://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-	<script type="text/javascript">
-$(document).ready(function () {
-	 
-	var Chanel = "UCBgTP2LOFVPmq15W-RH-WXA"; // TRT1 kanal ID'si istediğiniz bir kanalın ID'si ile değiştirin
-	var ApiKey = "AIzaSyBiGDn6FXr4qR0zh_UoZ4JFjWWReKXWfLQ"; // Google'dan aldığınız API kimliği
-	
-	var videosURL = ""; // videosURL değişkeni oluşturduk
-	var yenile = true; //yenile değişkeni true ayarladık
-	
-	var channelId = "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id="+Chanel+"&key="+ApiKey;
-	$.getJSON(channelId, function(chid) {
+Public Function VeriAl(strGelen)
+	Set objVeriAl = Server.CreateObject("Microsoft.XMLHTTP")
+	objVeriAl.Open "GET" , strGelen, FALSE		
+	objVeriAl.sEnd
+	VeriAl = objVeriAl.Responsetext
+	SET objVeriAl = Nothing
+End Function
 
-		videosURL = "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId="+chid.items[0].id+"&eventType=live&type=video&key="+ApiKey;
-		$.getJSON(videosURL, function(vid) {
-			
-			if(vid.items.length > 0){
-				
-				// adres sonundaki ?autoplay=1 otomatik başlaması için istemiyorsanız kaldırın
-				$("#trt1").attr("src", "https://www.youtube.com/embed/" + vid.items[0].id.videoId + "?autoplay=1");
-				yenile = false;
-				$("#uyari").text('Yayın canlı!');
-				
-			} else {
-				
-				// Bu kısımda yayın yoksa gösterilecek olan video kodları eklenebilir, veritabanından çekilebilir, Alttaki kodlar olduğu gibi kalırsa kanala eklenen son videoyu çeker
-				var uploads = chid.items[0].contentDetails.relatedPlaylists.uploads
-				var sonvideoAdres = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId="+uploads+"&key="+ApiKey;
-				$.getJSON(sonvideoAdres, function(svid) {
-					if(svid.items.length > 0){
-						$("#trt1").attr("src", "https://www.youtube.com/embed/" + svid.items[0].snippet.resourceId.videoId + "?autoplay=1");
-						$("#uyari").text('Yayın yok son video oynatılıyor!');
-					} else {
-						//Yayın yok ve son video alınamadı varsayılan video
-						$("#trt1").attr("src", "https://www.youtube.com/embed/4yXJBAhn0Q4?autoplay=1");
-						$("#uyari").text('Yayın yok ve son video alınamadı varsayılan video!');
-						yenile = false;
-					}
-				});
-				
-			}
-			
-		});
+	strVeri = VeriAL("https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id="& chanel &"&key="& apiKey)
+	chid = split(strVeri, """")
+	
+if InStr(strVeri,"items") > 0 then
+
+	videoAdres = VeriAL("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId="& chid(31) &"&eventType=live&type=video&key="& apiKey)
+
+if Request.QueryString("canlikontrol") = "true" then
+	Response.Write(videoAdres)
+response.end	
+end if
+	
+	vid = split(videoAdres, """")
+	if UBound(vid) > 22 then
+		Uyari = "Yayın canlı!"
+		VideoAdres = vid(41)
+		'yenile değişkeni false yayın var artık yenilemesin
+		Response.Write "<script type=""text/javascript"">yenile = false;</script>"
+	else
+	
+		sonvideoAdres = VeriAL("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId="& chid(43) &"&key="& apiKey)
+		svid = split(sonvideoAdres, """")
+
+		if UBound(svid) > 124 then
+			Uyari = "Yayın yok son video oynatılıyor!"
+			VideoAdres = svid(125)
+		else
+			Uyari = "Yayın yok ve son video alınamadı varsayılan video!"
+			VideoAdres = "4yXJBAhn0Q4" 'Yayın yok ve son video alınamadı varsayılan video
+			Response.Write "<script type=""text/javascript"">yenile = false;</script>"
+		end if
 		
-	}).fail(function() {
-		//Kota dolu o zaman varsayılan vıdeo oynatılsın( Youtube API günlük aylık ve anlık bazında bazı kotalarla sınırlandırılmıştır )
-		// https://console.developers.google.com adresinden kota durumunu kontrol edebilirsiniz
-		$("#trt1").attr("src", "https://www.youtube.com/embed/4yXJBAhn0Q4?autoplay=1");
-		yenile = false;
-		$("#uyari").text('Youtube API Kotanız doldu https://console.developers.google.com adresinden kota durumunu kontrol edebilirsiniz');
-	});
+	end if
 
-// sürekli yenileyerek canlı yayın varsa oynatılan videoyu canlı yayın adresi ile değiştiren function
-function YayinKontrol(){
-	if(yenile){
-		$.getJSON(videosURL, function(control) {
-			if(control.items.length > 0){
-				$("#trt1").attr("src", "https://www.youtube.com/embed/" + control.items[0].id.videoId + "?autoplay=1");
-				yenile = false; //yenile değişkeni false yayın var artık yenilemesin
-				$("#uyari").text('Canlı Yayın Bekleniyor!');
-			}
-		});
-	
-		setTimeout(function(){
-			YayinKontrol(); //tekrar tekrar istek gönder;
-		}, 10000); // yenileme süresi 10sn 
-	}
-}
+else
+	Uyari = "Youtube API Kotanız doldu https://console.developers.google.com adresinden kota durumunu kontrol edebilirsiniz"
+	VideoAdres = "4yXJBAhn0Q4" 'Yayın yok kota doldu varsayılan video
+end if
 
-YayinKontrol();//YayinKontrol functionu sayfa ilk yüklendiğinde 1 defa tetikleyelim
 
-});
+Response.Write "<div id=""uyari"">" & Uyari & "</div><br>"
 
-</script>
+'adres sonundaki ?autoplay=1 otomatik başlaması için istemiyorsanız kaldırın
+Response.Write "<iframe id=""trt1"" width=""640"" height=""360"" src=""https://www.youtube.com/embed/" & VideoAdres & "?autoplay=1"" frameborder=""0"" allow=""accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"" allowfullscreen></iframe>"
 
-</head>
-
-<body>
-
-<div id="uyari"></div><br>
-TRT1 Canlı Yayını!<br><iframe width="640" height="360" id="trt1" src="" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-</body>
-</html>
+'YayinKontrol functionu sayfa ilk yüklendiğinde 1 defa tetikleyelim
+Response.Write "<script type=""text/javascript"">$(document).ready(function () { YayinKontrol(); });</script>"
+%>
