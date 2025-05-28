@@ -1,60 +1,40 @@
-<%
-	chanel = "UCBgTP2LOFVPmq15W-RH-WXA" 'TRT1 kanal ID'si istediğiniz bir kanalın ID'si ile değiştirin
-	apiKey = "AIzaSyBiGDn6FXr4qR0zh_UoZ4JFjWWReKXWfLQ" 'Google'dan aldığınız API kimliği
+<?php
+ob_start();
+header('Content-Type: text/html; charset=utf-8');
+?>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+	<title>Youtube den canlı yayın PHP AJAX</title>
+	<meta charset="utf-8">
 	
-Public Function VeriAl(strGelen)
-	Set objVeriAl = Server.CreateObject("Microsoft.XMLHTTP")
-	objVeriAl.Open "GET" , strGelen, FALSE		
-	objVeriAl.sEnd
-	VeriAl = objVeriAl.Responsetext
-	SET objVeriAl = Nothing
-End Function
+	<script src="http://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+var yenile = true; //yenile değişkeni true ayarladık
+// sürekli yenileyerek canlı yayın varsa oynatılan videoyu canlı yayın adresi ile değiştiren function
+function YayinKontrol(){
+	if(yenile){
+		$.getJSON("php/youtube.php?canlikontrol", function(control) {
+			if(control.items.length > 0){
+				$("#trt1").attr("src", "https://www.youtube.com/embed/" + control.items[0].id.videoId + "?autoplay=1");
+				yenile = false; //yenile değişkeni false yayın var artık yenilemesin
+			}
+		});
+		setTimeout(function(){
+			YayinKontrol(); //tekrar tekrar istek gönder;
+		}, 10000); // yenileme süresi 10sn 
+	}
+}
+</script>
 
-	strVeri = VeriAL("https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id="& chanel &"&key="& apiKey)
-	chid = split(strVeri, """")
-	
-if InStr(strVeri,"items") > 0 then
+</head>
 
-	videoAdres = VeriAL("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId="& chid(31) &"&eventType=live&type=video&key="& apiKey)
+<body>
 
-if Request.QueryString("canlikontrol") = "true" then
-	Response.Write(videoAdres)
-response.end	
-end if
-	
-	vid = split(videoAdres, """")
-	if UBound(vid) > 22 then
-		Uyari = "Yayın canlı!"
-		VideoAdres = vid(41)
-		'yenile değişkeni false yayın var artık yenilemesin
-		Response.Write "<script type=""text/javascript"">yenile = false;</script>"
-	else
-	
-		sonvideoAdres = VeriAL("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId="& chid(43) &"&key="& apiKey)
-		svid = split(sonvideoAdres, """")
+<?php include("php/youtube.php"); ?>
 
-		if UBound(svid) > 124 then
-			Uyari = "Yayın yok son video oynatılıyor!"
-			VideoAdres = svid(125)
-		else
-			Uyari = "Yayın yok ve son video alınamadı varsayılan video!"
-			VideoAdres = "4yXJBAhn0Q4" 'Yayın yok ve son video alınamadı varsayılan video
-			Response.Write "<script type=""text/javascript"">yenile = false;</script>"
-		end if
-		
-	end if
-
-else
-	Uyari = "Youtube API Kotanız doldu https://console.developers.google.com adresinden kota durumunu kontrol edebilirsiniz"
-	VideoAdres = "4yXJBAhn0Q4" 'Yayın yok kota doldu varsayılan video
-end if
-
-
-Response.Write "<div id=""uyari"">" & Uyari & "</div><br>"
-
-'adres sonundaki ?autoplay=1 otomatik başlaması için istemiyorsanız kaldırın
-Response.Write "<iframe id=""trt1"" width=""640"" height=""360"" src=""https://www.youtube.com/embed/" & VideoAdres & "?autoplay=1"" frameborder=""0"" allow=""accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"" allowfullscreen></iframe>"
-
-'YayinKontrol functionu sayfa ilk yüklendiğinde 1 defa tetikleyelim
-Response.Write "<script type=""text/javascript"">$(document).ready(function () { YayinKontrol(); });</script>"
-%>
+</body>
+</html>
+<?php
+ob_end_flush();
+?>
