@@ -1,0 +1,175 @@
+:root {
+    --player-bg: #000;
+    --menu-bg: rgba(30, 30, 30, 0.95); /* Yarı şeffaf koyu menü */
+    --menu-text-color: #f0f0f0;
+    --menu-highlight-color: #007bff; /* Mavi vurgu */
+    --menu-active-color: #0056b3; /* Koyu mavi aktif */
+    --scroll-thumb-color: #555;
+    --scroll-track-color: #333;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a1a1a; /* Koyu arka plan */
+    color: #f0f0f0;
+    overflow: hidden; /* Sayfada kaydırmayı engelle */
+}
+
+/* Oynatıcıyı ve menüyü saran ana konteyner */
+.player-wrapper {
+    position: relative;
+    width: 100vw; /* Görünüm genişliği */
+    height: 100vh; /* Görünüm yüksekliği */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--player-bg);
+    overflow: hidden;
+}
+
+/* Video.js Oynatıcı */
+.video-js {
+    width: 100% !important;
+    height: 100% !important; /* Tamamen sarmala */
+}
+
+/* Player üzerindeki etkileşim bölgeleri */
+.player-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex; /* Bölgeleri yan yana dizer */
+    z-index: 10; /* Menünün altında kalmalı */
+    opacity: 0; /* Başlangıçta gizli */
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* Üzerine tıklanamaz, video kontrol edilebilir */
+}
+
+.player-overlay.active {
+    opacity: 1;
+    pointer-events: auto; /* Aktifken tıklanabilir */
+}
+
+.player-zone {
+    flex-grow: 1; /* Her bölge eşit genişler */
+    height: 100%;
+    cursor: pointer;
+    background-color: transparent;
+    /* Debug için: border: 1px solid rgba(255,255,255,0.2); */
+}
+
+/* Player üzerindeki tam ekran menüsü */
+.channel-menu {
+    position: absolute;
+    top: 0;
+    right: 0; /* Başlangıçta sağda, gizli */
+    width: 300px; /* Menü genişliği */
+    height: 100%;
+    background-color: var(--menu-bg);
+    color: var(--menu-text-color);
+    padding: 20px;
+    box-sizing: border-box;
+    transform: translateX(100%); /* Tamamen dışarıda gizli */
+    transition: transform 0.3s ease-in-out;
+    z-index: 100; /* Player'ın üzerinde olmalı */
+    display: flex;
+    flex-direction: column;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+    overflow: hidden; /* İçerik taşmasını engelle */
+}
+
+.channel-menu.visible {
+    transform: translateX(0); /* Menüyü içeri getir */
+}
+
+.channel-menu h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: var(--menu-highlight-color);
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 15px;
+}
+
+#channel-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1; /* Menüde kalan alanı doldur */
+    overflow-y: auto; /* Kanal listesi uzunsa kaydırma çubuğu */
+}
+
+/* Kaydırma çubuğu stilizasyonu */
+#channel-list::-webkit-scrollbar {
+    width: 8px;
+}
+#channel-list::-webkit-scrollbar-track {
+    background: var(--scroll-track-color);
+    border-radius: 10px;
+}
+#channel-list::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb-color);
+    border-radius: 10px;
+}
+#channel-list::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+
+#channel-list li a {
+    display: block;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: var(--menu-text-color);
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#channel-list li:last-child a {
+    border-bottom: none;
+}
+
+#channel-list li a:hover {
+    background-color: var(--menu-item-hover);
+}
+
+#channel-list li a.active {
+    background-color: var(--menu-active-color);
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Video.js kontrollerini tam ekranda otomatik gizleme süresi */
+/* Bu CSS videojs'nin varsayılan davranışını değiştirir */
+.video-js.vjs-fullscreen .vjs-control-bar,
+.video-js.vjs-fullscreen .vjs-big-play-button {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.video-js.vjs-fullscreen.vjs-user-active .vjs-control-bar,
+.video-js.vjs-fullscreen.vjs-user-active .vjs-big-play-button {
+    opacity: 1;
+}
+
+/* Mobil uyumluluk (responsive design) */
+@media (max-width: 768px) {
+    .channel-menu {
+        width: 100%; /* Mobil cihazlarda menü tam ekran genişliğinde */
+        transform: translateX(100%); /* Yine gizle */
+    }
+
+    /* Player zone'ları mobil cihazlarda biraz farklı boyutlandırabiliriz */
+    .player-zone.left-zone, .player-zone.right-zone {
+        flex-basis: 30%; /* Daha az yer kaplasın dokunma alanı */
+    }
+    .player-zone.center-zone {
+        flex-basis: 40%;
+    }
+}
