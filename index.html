@@ -1,33 +1,90 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>M3U8 Player</title>
-  <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+	<title>Youtube den canlı yayın JSON AJAX jQuery</title>
+	<meta charset="utf-8">
+	
+	<script src="http://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script type="text/javascript">
+$(document).ready(function () {
+	 
+	var Chanel = "UCBgTP2LOFVPmq15W-RH-WXA"; // TRT1 kanal ID'si istediğiniz bir kanalın ID'si ile değiştirin
+	var ApiKey = "AIzaSyBiGDn6FXr4qR0zh_UoZ4JFjWWReKXWfLQ"; // Google'dan aldığınız API kimliği
+	
+	var videosURL = ""; // videosURL değişkeni oluşturduk
+	var yenile = true; //yenile değişkeni true ayarladık
+	
+	var channelId = "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id="+Chanel+"&key="+ApiKey;
+	$.getJSON(channelId, function(chid) {
+
+		videosURL = "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId="+chid.items[0].id+"&eventType=live&type=video&key="+ApiKey;
+		$.getJSON(videosURL, function(vid) {
+			
+			if(vid.items.length > 0){
+				
+				// adres sonundaki ?autoplay=1 otomatik başlaması için istemiyorsanız kaldırın
+				$("#trt1").attr("src", "https://www.youtube.com/embed/" + vid.items[0].id.videoId + "?autoplay=1");
+				yenile = false;
+				$("#uyari").text('Yayın canlı!');
+				
+			} else {
+				
+				// Bu kısımda yayın yoksa gösterilecek olan video kodları eklenebilir, veritabanından çekilebilir, Alttaki kodlar olduğu gibi kalırsa kanala eklenen son videoyu çeker
+				var uploads = chid.items[0].contentDetails.relatedPlaylists.uploads
+				var sonvideoAdres = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId="+uploads+"&key="+ApiKey;
+				$.getJSON(sonvideoAdres, function(svid) {
+					if(svid.items.length > 0){
+						$("#trt1").attr("src", "https://www.youtube.com/embed/" + svid.items[0].snippet.resourceId.videoId + "?autoplay=1");
+						$("#uyari").text('Yayın yok son video oynatılıyor!');
+					} else {
+						//Yayın yok ve son video alınamadı varsayılan video
+						$("#trt1").attr("src", "https://www.youtube.com/embed/4yXJBAhn0Q4?autoplay=1");
+						$("#uyari").text('Yayın yok ve son video alınamadı varsayılan video!');
+						yenile = false;
+					}
+				});
+				
+			}
+			
+		});
+		
+	}).fail(function() {
+		//Kota dolu o zaman varsayılan vıdeo oynatılsın( Youtube API günlük aylık ve anlık bazında bazı kotalarla sınırlandırılmıştır )
+		// https://console.developers.google.com adresinden kota durumunu kontrol edebilirsiniz
+		$("#trt1").attr("src", "https://www.youtube.com/embed/4yXJBAhn0Q4?autoplay=1");
+		yenile = false;
+		$("#uyari").text('Youtube API Kotanız doldu https://console.developers.google.com adresinden kota durumunu kontrol edebilirsiniz');
+	});
+
+// sürekli yenileyerek canlı yayın varsa oynatılan videoyu canlı yayın adresi ile değiştiren function
+function YayinKontrol(){
+	if(yenile){
+		$.getJSON(videosURL, function(control) {
+			if(control.items.length > 0){
+				$("#trt1").attr("src", "https://www.youtube.com/embed/" + control.items[0].id.videoId + "?autoplay=1");
+				yenile = false; //yenile değişkeni false yayın var artık yenilemesin
+				$("#uyari").text('Canlı Yayın Bekleniyor!');
+			}
+		});
+	
+		setTimeout(function(){
+			YayinKontrol(); //tekrar tekrar istek gönder;
+		}, 10000); // yenileme süresi 10sn 
+	}
+}
+
+YayinKontrol();//YayinKontrol functionu sayfa ilk yüklendiğinde 1 defa tetikleyelim
+
+});
+
+</script>
+
 </head>
+
 <body>
 
-  <div class="player-wrapper">
-    <!-- Video Player -->
-    <video id="my-video" class="video-js vjs-default-skin" controls></video>
+<div id="uyari"></div><br>
+TRT1 Canlı Yayını!<br><iframe width="640" height="360" id="trt1" src="" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-    <!-- Tıklanabilir Overlay Bölgeleri -->
-    <div class="player-overlay">
-      <div id="player-left-zone" class="player-zone left-zone"></div>
-      <div id="player-center-zone" class="player-zone center-zone"></div>
-      <div id="player-right-zone" class="player-zone right-zone"></div>
-    </div>
-
-    <!-- Kanal Menüsü -->
-    <div id="channel-menu" class="channel-menu">
-      <h2>Kanallar</h2>
-      <ul id="channel-list"></ul>
-    </div>
-  </div>
-
-  <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-  <script src="script.js"></script>
 </body>
 </html>
