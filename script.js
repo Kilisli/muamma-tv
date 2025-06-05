@@ -149,10 +149,7 @@ function displayPlaylist(channels) {
         listItem.dataset.name = channel.name;
         listItem.dataset.index = index; // Store original index
         listItem.dataset.group = channel.groupTitle || 'Diğer'; // Gruplandırma için
-        listItem.innerHTML = `
-            <img src="${channel.tvgLogo || 'placeholder.png'}" onerror="this.onerror=null;this.src='placeholder.png';" alt="${channel.name}" class="channel-logo">
-            <span class="channel-name">${channel.name}</span>
-        `;
+       // listItem.innerHTML = ` <img src="${channel.tvgLogo || 'placeholder.png'}" onerror="this.onerror=null;this.src='placeholder.png';" alt="${channel.name}" class="channel-logo"> <span class="channel-name">${channel.name}</span>         `;
         listItem.addEventListener('click', () => {
             playChannel(channel.url, index);
             hidePlaylist();
