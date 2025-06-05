@@ -159,17 +159,13 @@ body.playlist-visible #playlist {
     border: 2px solid var(--bg-secondary);
 }
 
-
 #playlist li {
     padding: 10px 12px;
     border-bottom: 1px solid var(--border-color);
     cursor: pointer;
     transition: background-color var(--transition-fast), color var(--transition-fast);
-    white-space: nowrap; /* Metnin tek satırda kalmasını sağlar */
-    overflow: hidden; /* Taşan metni gizler */
-    text-overflow: ellipsis; /* Taşan metni üç nokta ile gösterir */
-    display: flex;
-    align-items: center;
+    display: flex; /* İçindeki öğeleri flexbox ile düzenle */
+    align-items: center; /* Dikeyde ortala */
 }
 
 #playlist li:last-child {
@@ -190,22 +186,35 @@ body.playlist-visible #playlist {
     background-color: var(--accent-blue-hover);
 }
 
-/* Kanal Logoları için CSS */
-.channel-item img {
-    max-width: 50px; /* İstediğiniz maksimum genişliği ayarlayın */
-    max-height: 30px; /* İstediğiniz maksimum yüksekliği ayarlayın */
-    width: auto;
-    height: auto;
-    margin-right: 10px; /* Logo ile kanal adı arasında boşluk bırakır */
-    object-fit: contain; /* Görüntünün oranlarını korurken elemana sığmasını sağlar */
-}
-
-/* Kanal öğesi içindeki hizalamayı düzeltmek için */
+/* Kanal Logoları için GÜNCELLENMİŞ CSS */
 .channel-item {
     display: flex;
     align-items: center; /* Logo ve metni dikey olarak hizalar */
+    overflow: hidden; /* Taşan içeriği gizle */
+    white-space: nowrap; /* Metnin tek satırda kalmasını sağlar */
+    text-overflow: ellipsis; /* Taşan metni üç nokta ile gösterir */
+    width: 100%; /* Kapsayıcının tam genişliğini almasını sağlar */
 }
 
+.channel-item img {
+    /* Daha küçük ve sabit bir boyut tanımlayalım */
+    width: 32px;  /* Logoların sabit genişliği */
+    height: 32px; /* Logoların sabit yüksekliği */
+    min-width: 32px; /* Minimum genişliği de sabitleyelim */
+    min-height: 32px; /* Minimum yüksekliği de sabitleyelim */
+    max-width: 32px;  /* Maksimum genişliği de sabitleyelim */
+    max-height: 32px; /* Maksimum yüksekliği de sabitleyelim */
+    margin-right: 10px; /* Logo ile kanal adı arasında boşluk bırakır */
+    object-fit: contain; /* Görüntünün oranlarını korurken elemana sığmasını sağlar */
+    flex-shrink: 0; /* Küçülmesini engeller */
+}
+
+/* Kanal adının logodan sonra kalan alanı doldurmasını ve taşmamasını sağla */
+.channel-item .channel-name {
+    flex-grow: 1; /* Mevcut alanı doldurmasını sağlar */
+    overflow: hidden; /* Taşan metni gizle */
+    text-overflow: ellipsis; /* Taşan metni üç nokta ile gösterir */
+}
 
 /* Playlist Toggle Handle */
 #playlist-toggle-handle {
@@ -719,6 +728,17 @@ body.playlist-visible #playlist-toggle-handle svg {
         grid-template-columns: repeat(2, 1fr);
         gap: 25px;
     }
+
+    /* Medya sorgularında da logo boyutunu kontrol edelim */
+    .channel-item img {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        min-height: 28px;
+        max-width: 28px;
+        max-height: 28px;
+        margin-right: 8px;
+    }
 }
 
 /* Mobile Styles */
@@ -779,5 +799,18 @@ body.playlist-visible #playlist-toggle-handle svg {
     .keyboard-shortcuts-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 15px;
+    }
+
+    .channel-item img {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        min-height: 24px;
+        max-width: 24px;
+        max-height: 24px;
+        margin-right: 6px;
+    }
+    .channel-item .channel-name {
+        font-size: 0.9em; /* Daha küçük ekranlarda yazı boyutunu küçült */
     }
 }
