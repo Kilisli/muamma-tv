@@ -150,7 +150,7 @@ function displayPlaylist(channels) {
         listItem.dataset.index = index; // Store original index
         listItem.dataset.group = channel.groupTitle || 'Diğer'; // Gruplandırma için
         listItem.innerHTML = `
-            <img src="${channel.tvgLogo || 'placeholder.png'}" onerror="this.onerror=null;this.src='placeholder.png';" alt="${channel.name}" class="channel-logo">
+            // <img src="${channel.tvgLogo || 'placeholder.png'}" onerror="this.onerror=null;this.src='placeholder.png';" alt="${channel.name}" class="channel-logo"> // REMOVE OR COMMENT THIS LINE
             <span class="channel-name">${channel.name}</span>
         `;
         listItem.addEventListener('click', () => {
