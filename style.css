@@ -1,67 +1,127 @@
-/* ... (mevcut CSS kodlarınız) ... */
+/* CSS Custom Properties */
+:root {
+    --bg-primary: #1e1e1e; /* Bu zaten koyu gri, isterseniz bunu #000 yapabilirsiniz */
+    --bg-secondary: #2a2a2a;
+    --bg-tertiary: #252525;
+    --bg-dark: #1a1a1a; /* Daha koyu griye yakın siyah */
+    --text-primary: #f4f4f4;
+    /* ... diğer değişkenler ... */
+}
 
+/* Reset and Base Styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    /* Arka plan rengini tam siyah yapmak isterseniz: */
+    background-color: #000;
+    /* Veya tanımlı değişkeni kullanmak isterseniz (koyu gri): */
+    /* background-color: var(--bg-primary); */
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden; /* Dışa taşmayı önler */
+}
+
+.container {
+    background-color: #000; /* Konteynerin de arka planını tam siyah yapalım */
+    /* Veya tanımlı değişkeni kullanmak isterseniz: */
+    /* background-color: var(--bg-primary); */
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-heavy);
+    display: flex;
+    flex-direction: row; /* Yan yana durmaları için */
+    overflow: hidden; /* İçerik taşmasını engelle */
+    height: 90vh; /* Ekran yüksekliğinin %90'ı */
+    max-height: 900px; /* Maksimum yükseklik sınırı */
+    width: 95vw; /* Ekran genişliğinin %95'i */
+    max-width: 1600px; /* Maksimum genişlik sınırı */
+}
+
+/* ... (geri kalan CSS kodunuz) ... */
+
+/* Kanal simgeleri için önceki önerilen düzenlemeler */
 #playlist ul li {
-    display: flex; /* Eklendi */
-    align-items: center; /* Eklendi */
+    display: flex;
+    align-items: center;
     padding: 10px;
     border-bottom: 1px solid var(--border-color);
     cursor: pointer;
     transition: background-color var(--transition-fast), transform var(--transition-fast);
-    white-space: nowrap; /* Taşmayı önlemek için eklendi */
-    overflow: hidden; /* Taşmayı gizlemek için eklendi */
-    text-overflow: ellipsis; /* Taşmayı üç nokta ile belirtmek için eklendi */
-}
-
-#playlist ul li:hover {
-    background-color: var(--bg-secondary);
-    transform: translateX(3px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #playlist ul li.selected {
     background-color: var(--accent-blue);
     color: var(--text-primary);
     font-weight: bold;
-    border-left: 3px solid var(--text-primary); /* Seçili öğeyi vurgula */
-    padding-left: 7px; /* border-left'e göre ayarlandı */
+    border-left: 3px solid var(--text-primary);
+    padding-left: 7px;
 }
 
 .channel-logo {
-    width: 32px; /* Daha küçük bir varsayılan boyut */
-    height: 32px; /* Daha küçük bir varsayılan boyut */
-    min-width: 32px; /* Sabit minimum genişlik */
-    max-width: 48px; /* Maksimum genişlik sınırı */
-    max-height: 48px; /* Maksimum yükseklik sınırı */
-    object-fit: contain; /* Görüntünün oranlarını koruyarak sığdırır */
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    max-width: 48px;
+    max-height: 48px;
+    object-fit: contain;
     border-radius: var(--border-radius-small);
     margin-right: 10px;
-    flex-shrink: 0; /* Logoyu büzülmesini engeller, eklendi */
+    flex-shrink: 0;
 }
 
 .channel-name {
-    flex-grow: 1; /* Mevcut alanı doldurmasını sağlar, eklendi */
-    overflow: hidden; /* Taşmayı gizler, eklendi */
-    white-space: nowrap; /* Metnin tek satırda kalmasını sağlar, eklendi */
-    text-overflow: ellipsis; /* Taşmayı üç nokta ile gösterir, eklendi */
+    flex-grow: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-size: 0.95em;
 }
 
-/* ... (diğer medya sorguları ve CSS kodlarınız) ... */
-
 @media (max-width: 768px) {
-    /* ... (mevcut mobil stilleriniz) ... */
+    body {
+        /* Mobil cihazlarda da arka planı siyah yapalım */
+        background-color: #000;
+        /* Veya tanımlı değişkeni kullanmak isterseniz: */
+        /* background-color: var(--bg-primary); */
+    }
+
+    .container {
+        flex-direction: column; /* Mobil için dikey düzen */
+        height: 100vh;
+        width: 100vw;
+        border-radius: 0;
+        box-shadow: none;
+        background-color: #000; /* Mobil konteynerin de arka planını siyah yapalım */
+        /* Veya tanımlı değişkeni kullanmak isterseniz: */
+        /* background-color: var(--bg-primary); */
+    }
 
     #playlist ul li {
-        padding: 8px; /* Mobil için daha az dolgu */
+        padding: 8px;
     }
 
     .channel-logo {
-        width: 28px; /* Mobil için daha küçük logo */
-        height: 28px; /* Mobil için daha küçük logo */
+        width: 28px;
+        height: 28px;
         min-width: 28px;
-        margin-right: 8px; /* Mobil için daha az boşluk */
+        margin-right: 8px;
     }
 
     .channel-name {
-        font-size: 0.85em; /* Mobil için daha küçük yazı tipi */
+        font-size: 0.85em;
     }
+
+    /* ... (diğer mobil stilleriniz) ... */
 }
+
+/* ... (geri kalan CSS kodunuz) ... */
