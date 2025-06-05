@@ -1,3 +1,15 @@
+/* Kanal logolarını gizlemek için bu bloğu kaldırın */
+/*
+.channel-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-right: 10px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+*/
+
 /* CSS Custom Properties */
 :root {
     --bg-primary: #1e1e1e;
