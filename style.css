@@ -1,3 +1,12 @@
+/* Kanal logosu stilini düzenle */
+.playlist-item img {
+    width: 40px; /* Logoların genişliğini ayarla */
+    height: 40px; /* Logoların yüksekliğini ayarla */
+    margin-right: 10px;
+    border-radius: var(--border-radius-small);
+    flex-shrink: 0; /* Resmin küçülmesini engelle */
+    object-fit: contain; /* Oranları koruyarak resmi sığdır */
+}
 /* CSS Custom Properties */
 :root {
     --bg-primary: #1e1e1e;
