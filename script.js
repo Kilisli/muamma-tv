@@ -141,31 +141,60 @@ function parseM3u(data) {
 }
 
 
+// Kanal listesini görüntüleme fonksiyonu
 function displayPlaylist(channels) {
     playlistElement.innerHTML = '';
-    channels.forEach((channel, index) => {
-        const listItem = document.createElement('li');
-        listItem.dataset.url = channel.url;
-        listItem.dataset.name = channel.name;
-        listItem.dataset.index = index; // Store original index
-        listItem.dataset.group = channel.groupTitle || 'Diğer'; // Gruplandırma için
-       listItem.innerHTML = ` <img src="${channel.name}" class="channel-logo"> <span class="channel-name">${channel.name}</span>         `;
-        listItem.addEventListener('click', () => {
-            playChannel(channel.url, index);
-            hidePlaylist();
-        });
-        playlistElement.appendChild(listItem);
+    const groups = {};
+
+    // Kanalları gruplara ayır
+    channels.forEach(channel => {
+        const groupName = channel.groupTitle || 'Diğer';
+        if (!groups[groupName]) {
+            groups[groupName] = [];
+        }
+        groups[groupName].push(channel);
     });
 
-    // Kanal listesini oluşturduktan sonra seçili kanalı işaretle
-    if (currentPlaylistName === playlistSelector.value) { // Sadece aynı oynatma listesindeyken
-        const selectedChannel = playlistElement.querySelector(`li[data-index="${currentChannelIndex}"]`);
-        if (selectedChannel) {
-            selectedChannel.classList.add('selected');
-            selectedChannel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Grupları sırala (isteğe bağlı)
+    const sortedGroupNames = Object.keys(groups).sort((a, b) => {
+        // "Diğer" grubunu en sona at
+        if (a === 'Diğer') return 1;
+        if (b === 'Diğer') return -1;
+        return a.localeCompare(b);
+    });
+
+    sortedGroupNames.forEach(groupName => {
+        const groupHeader = document.createElement('li');
+        groupHeader.className = 'group-header';
+        groupHeader.textContent = groupName;
+        groupHeader.dataset.groupName = groupName; // Grubu işaretle
+        playlistElement.appendChild(groupHeader);
+
+        // Eğer bu grup seçili değilse, kanalları gizle
+        if (groupName !== currentGroup) {
+            groupHeader.classList.add('collapsed');
         }
-    }
-}
+
+        groups[groupName].forEach((channel, index) => {
+            const listItem = document.createElement('li');
+            listItem.dataset.url = channel.url;
+            listItem.dataset.name = channel.name;
+            listItem.dataset.index = index; // Store original index
+            listItem.dataset.group = channel.groupTitle || 'Diğer'; // Gruplandırma için
+            listItem.innerHTML = `
+                <span class="channel-name">${channel.name}</span>
+            `; // Sadece kanal adını gösterir
+            listItem.addEventListener('click', () => {
+                playChannel(channel.url, index);
+                hidePlaylist();
+            });
+            // Grubu gizlemek için class ekle
+            if (groupName !== currentGroup) {
+                listItem.classList.add('hidden-by-group');
+            }
+            playlistElement.appendChild(listItem);
+        });
+    });
 
 function playChannel(url, index) {
     player.src({
