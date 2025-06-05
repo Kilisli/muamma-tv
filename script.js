@@ -1,6 +1,6 @@
 const player = videojs('my-video');
 
-const defaultM3uUrl = 'https://raw.githubusercontent.com/Sakubaba00/saku/refs/heads/main/playlist1.m3u';
+const defaultM3uUrl = 'https://lemonchiffon-dotterel-347603.hostingersite.com/yayin.m3u8';
 
 const playlistElement = document.querySelector('#playlist ul');
 const playlistContainer = document.getElementById('playlist');
