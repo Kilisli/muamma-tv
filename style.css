@@ -1205,4 +1205,71 @@ body.drag-over::before {
         font-size: 0.75rem;
         margin-left: 6px;
     }
+} 
+/* ... (mevcut CSS kodlarınız) ... */
+
+#playlist ul li {
+    display: flex; /* Eklendi */
+    align-items: center; /* Eklendi */
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+    white-space: nowrap; /* Taşmayı önlemek için eklendi */
+    overflow: hidden; /* Taşmayı gizlemek için eklendi */
+    text-overflow: ellipsis; /* Taşmayı üç nokta ile belirtmek için eklendi */
+}
+
+#playlist ul li:hover {
+    background-color: var(--bg-secondary);
+    transform: translateX(3px);
+}
+
+#playlist ul li.selected {
+    background-color: var(--accent-blue);
+    color: var(--text-primary);
+    font-weight: bold;
+    border-left: 3px solid var(--text-primary); /* Seçili öğeyi vurgula */
+    padding-left: 7px; /* border-left'e göre ayarlandı */
+}
+
+.channel-logo {
+    width: 32px; /* Daha küçük bir varsayılan boyut */
+    height: 32px; /* Daha küçük bir varsayılan boyut */
+    min-width: 32px; /* Sabit minimum genişlik */
+    max-width: 48px; /* Maksimum genişlik sınırı */
+    max-height: 48px; /* Maksimum yükseklik sınırı */
+    object-fit: contain; /* Görüntünün oranlarını koruyarak sığdırır */
+    border-radius: var(--border-radius-small);
+    margin-right: 10px;
+    flex-shrink: 0; /* Logoyu büzülmesini engeller, eklendi */
+}
+
+.channel-name {
+    flex-grow: 1; /* Mevcut alanı doldurmasını sağlar, eklendi */
+    overflow: hidden; /* Taşmayı gizler, eklendi */
+    white-space: nowrap; /* Metnin tek satırda kalmasını sağlar, eklendi */
+    text-overflow: ellipsis; /* Taşmayı üç nokta ile gösterir, eklendi */
+    font-size: 0.95em;
+}
+
+/* ... (diğer medya sorguları ve CSS kodlarınız) ... */
+
+@media (max-width: 768px) {
+    /* ... (mevcut mobil stilleriniz) ... */
+
+    #playlist ul li {
+        padding: 8px; /* Mobil için daha az dolgu */
+    }
+
+    .channel-logo {
+        width: 28px; /* Mobil için daha küçük logo */
+        height: 28px; /* Mobil için daha küçük logo */
+        min-width: 28px;
+        margin-right: 8px; /* Mobil için daha az boşluk */
+    }
+
+    .channel-name {
+        font-size: 0.85em; /* Mobil için daha küçük yazı tipi */
+    }
 }
