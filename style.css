@@ -1,12 +1,3 @@
-/* Kanal logosu stilini düzenle */
-.playlist-item img {
-    width: 40px; /* Logoların genişliğini ayarla */
-    height: 40px; /* Logoların yüksekliğini ayarla */
-    margin-right: 10px;
-    border-radius: var(--border-radius-small);
-    flex-shrink: 0; /* Resmin küçülmesini engelle */
-    object-fit: contain; /* Oranları koruyarak resmi sığdır */
-}
 /* CSS Custom Properties */
 :root {
     --bg-primary: #1e1e1e;
@@ -43,955 +34,488 @@ body {
     padding: 0;
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    overflow: hidden;
+    overflow: hidden; /* Kaydırmayı kapat */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    transition: background-color var(--transition-normal);
 }
 
-/* TV Mode - Hide cursor after inactivity */
-body.hide-cursor,
-body.hide-cursor * {
-    cursor: none !important;
+body.playlist-visible {
+    /* Playlist açıkken body'nin arka plan rengini koyulaştır */
+    background-color: var(--bg-dark);
 }
 
-/* Layout Container */
 .container {
     display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background: var(--bg-secondary);
+    width: 100%;
+    height: 100vh; /* Tam ekran yüksekliği */
+    max-height: 100vh; /* Maksimum tam ekran yüksekliği */
+    overflow: hidden; /* İçeriğin taşmasını engelle */
+    position: relative;
 }
 
 .main-content {
-    flex: 1;
+    flex-grow: 1; /* Video oynatıcısının kalan alanı kaplamasını sağla */
     display: flex;
-    overflow: hidden;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative; /* Player üzerindeki öğeler için konumlandırma */
 }
 
-/* Video Player */
+/* Video Player Styles */
 .video-js {
-    flex: 1;
-    width: 100%;
-    height: 100%;
-    background-color: #000;
-    padding: 0;
-    margin: 0;
-    border-radius: 0;
+    width: 100% !important; /* Esnek genişlik */
+    height: auto !important; /* Otomatik yükseklik */
+    max-width: 100%; /* Maksimum genişlik */
+    max-height: calc(100vh - 40px); /* Ekran yüksekliğinden padding'i çıkar */
+    border-radius: var(--border-radius);
     overflow: hidden;
-    border: none !important;
-    outline: none !important;
+    background-color: #000;
 }
 
-.video-js:-webkit-full-screen,
-.video-js:-moz-full-screen,
-.video-js:-ms-fullscreen,
-.video-js:fullscreen,
-.vjs-fullscreen .video-js {
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 0 !important;
+/* Video.js kontrol çubuğu ve düğmeler için stil */
+.video-js .vjs-control-bar {
+    background-color: rgba(0, 0, 0, 0.7); /* Şeffaf kontrol çubuğu */
+    font-size: 0.9em;
+    height: 3em;
 }
 
-/* Playlist Panel */
+.video-js .vjs-big-play-button {
+    font-size: 3em;
+    line-height: 2em;
+    height: 2em;
+    width: 2em;
+    border-radius: 50%;
+    background-color: rgba(74, 158, 255, 0.8);
+    border: none;
+    transition: background-color var(--transition-fast);
+}
+
+.video-js .vjs-big-play-button:hover {
+    background-color: var(--accent-blue);
+}
+
+/* Playlist Styles */
 #playlist {
-    position: fixed;
+    width: var(--playlist-width); /* Sabit genişlik */
+    background-color: var(--bg-secondary);
+    box-shadow: var(--shadow-heavy);
+    padding: 20px;
+    overflow-y: auto; /* İçerik için kaydırma çubuğu */
+    position: absolute; /* Ana içeriğin üzerinde konumlandır */
     top: 0;
-    left: 0;
-    width: var(--playlist-width);
-    height: 100vh;
-    background-color: var(--bg-dark);
-    z-index: 1000;
-    padding: 15px;
-    transform: translateX(-100%);
+    right: 0; /* Başlangıçta sağda gizli */
+    bottom: 0;
+    transform: translateX(100%); /* Başlangıçta ekran dışına taşı */
     opacity: 0;
-    transition: transform var(--transition-normal), opacity var(--transition-normal);
-    overflow-y: auto;
-    border-right: 1px solid var(--border-color);
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* Açılış/kapanış animasyonu */
+    z-index: 1000; /* Video oynatıcısının üzerinde olmasını sağla */
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
 }
 
-#playlist::-webkit-scrollbar {
-    width: 8px;
-}
-
-#playlist::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-}
-
-#playlist::-webkit-scrollbar-thumb {
-    background-color: var(--border-hover);
-    border-radius: var(--border-radius-small);
-    border: 2px solid var(--bg-secondary);
-}
-
-#playlist::-webkit-scrollbar-thumb:hover {
-    background-color: #777;
-}
-
-/* Playlist Visibility States */
-body.playlist-visible #playlist {
-    transform: translateX(0);
+#playlist.active {
+    transform: translateX(0); /* Açıldığında içeri gel */
     opacity: 1;
-}
-
-body.playlist-visible .main-content .video-js {
-    margin-left: var(--playlist-width);
-    transition: margin-left var(--transition-normal);
-}
-
-/* Disable transitions during page load */
-body.no-transition #playlist,
-body.no-transition .main-content .video-js,
-body.no-transition #playlist-toggle-handle,
-body.no-transition #playlist-toggle-handle span {
-    transition: none !important;
-}
-
-/* Playlist Header */
-#playlist h2 {
-    margin: 0 0 15px;
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-    font-weight: 500;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 8px;
-    flex: 1;
 }
 
 .playlist-header-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-    gap: 10px;
-}
-
-/* Info Button Header */
-.info-button-header {
-    background: var(--bg-tertiary);
-    color: var(--text-disabled);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-fast);
-    width: 32px;
-    height: 32px;
-    opacity: 0.8;
-    flex-shrink: 0;
-}
-
-.info-button-header:hover {
-    background: var(--border-hover);
-    color: var(--accent-blue);
-    opacity: 1;
-    transform: scale(1.05);
-}
-
-.info-button-header:active {
-    background: var(--border-color);
-    transform: scale(0.95);
-}
-
-/* Playlist Selector */
-.playlist-selector-container {
     margin-bottom: 15px;
-}
-
-.playlist-selector-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-#playlist-selector {
-    flex: 1;
-    padding: 10px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    background-color: var(--bg-tertiary);
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    cursor: pointer;
-    outline: none;
-    transition: all var(--transition-fast);
-    max-width: 200px;
-    min-width: 150px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-#playlist-selector:focus {
-    border-color: var(--accent-blue);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: -20px; /* Header'ı yapışkan yapmak için */
     background-color: var(--bg-secondary);
-    box-shadow: 0 0 8px rgba(74, 158, 255, 0.2);
+    z-index: 10;
+    padding-top: 20px; /* Yapışkan başlığın üstünde boşluk bırak */
+    margin-top: -20px; /* Kendi üst boşluğunu sıfırla */
 }
 
-#playlist-selector option {
-    background-color: var(--bg-tertiary);
-    color: var(--text-secondary);
-    padding: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px;
+#playlist h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: var(--text-primary);
 }
 
-/* Playlist Actions */
-.playlist-actions {
-    display: flex;
-    gap: 4px;
-}
-
-.playlist-action-btn {
-    background: #444;
-    color: #777;
-    border: none;
-    border-radius: var(--border-radius-small);
-    padding: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-fast);
-    width: 26px;
-    height: 26px;
-    opacity: 0.7;
-}
-
-.playlist-action-btn:hover {
-    background: var(--border-hover);
-    color: #999;
-    opacity: 1;
-}
-
-.playlist-action-btn:active {
-    background: var(--border-color);
-}
-
-.playlist-action-btn:disabled {
-    background: var(--border-color);
-    color: var(--border-hover);
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-#upload-button:hover {
-    color: var(--accent-green);
-}
-
-#upload-button:hover svg {
-    transform: rotate(90deg);
-}
-
-#rename-playlist-btn:hover {
-    color: var(--accent-blue);
-}
-
-#delete-playlist-btn:hover {
-    color: var(--accent-red);
-}
-
-/* Search Input */
-#playlist-search {
-    width: 100%;
-    padding: 10px 12px;
-    margin-bottom: 15px;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-    font-size: 0.9rem;
-    background-color: var(--bg-tertiary);
-    color: var(--text-secondary);
-    outline: none;
-    transition: all var(--transition-fast);
-}
-
-#playlist-search::placeholder {
-    color: var(--text-disabled);
-}
-
-#playlist-search:focus {
-    border-color: var(--accent-blue);
-    background-color: var(--bg-secondary);
-    box-shadow: 0 0 8px rgba(74, 158, 255, 0.2);
-}
-
-/* Playlist Items */
 #playlist ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    flex-grow: 1; /* Liste elemanlarının kalan alanı doldurmasını sağla */
 }
 
-#playlist li {
-    background-color: var(--bg-tertiary);
-    border: none;
-    margin-bottom: 2px;
-    padding: 12px 10px;
-    cursor: pointer;
-    border-radius: var(--border-radius);
-    transition: all var(--transition-fast);
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    border-left: 3px solid transparent;
-    will-change: transform;
-    contain: layout style;
-}
-
-#playlist li:hover {
-    background-color: #2d2d2d;
-    color: var(--text-primary);
-    border-left-color: var(--border-hover);
-}
-
-#playlist li.selected {
-    background-color: #1e3a5f;
-    color: var(--text-primary);
-    border-left-color: var(--accent-blue);
-    font-weight: 500;
-}
-
-/* Channel Items */
-#playlist li.channel-item {
+.playlist-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 8px 10px;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    background-color: var(--bg-tertiary);
+    border-radius: var(--border-radius-small);
+    cursor: pointer;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+    white-space: nowrap; /* Metnin tek satırda kalmasını sağla */
+    overflow: hidden; /* Taşan kısmı gizle */
+    text-overflow: ellipsis; /* Taşan kısım için üç nokta göster */
+}
+
+.playlist-item:hover {
+    background-color: var(--bg-dark);
+    transform: translateY(-2px);
+}
+
+.playlist-item.active {
+    background-color: var(--accent-blue);
+    color: #fff;
+}
+
+.playlist-item.active .channel-name {
+    color: #fff; /* Aktif kanal adını beyaz yap */
+}
+
+/* Kanal logosu stilini düzenle */
+.playlist-item img {
+    width: 40px; /* Logoların genişliğini ayarla */
+    height: 40px; /* Logoların yüksekliğini ayarla */
+    margin-right: 10px;
+    border-radius: var(--border-radius-small);
+    flex-shrink: 0; /* Resmin küçülmesini engelle */
+    object-fit: contain; /* Oranları koruyarak resmi sığdır */
 }
 
 .channel-name {
-    flex: 1;
-    margin-right: 8px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    flex-grow: 1; /* Kanal adının kalan alanı kaplamasını sağla */
+    font-size: 0.95em;
+    color: var(--text-secondary);
+    overflow: hidden; /* Metnin taşmasını engelle */
+    text-overflow: ellipsis; /* Taşan metin için üç nokta */
 }
 
-.channel-buttons {
+/* Playlist açma/kapama tutacağı */
+#playlist-toggle-handle {
+    position: absolute;
+    top: 50%;
+    left: -40px; /* Sidebar'ın dışında kalır */
+    transform: translateY(-50%) rotate(180deg); /* Yan çevir */
+    background-color: var(--accent-blue);
+    color: #fff;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0; /* Sağ tarafı yuvarlak */
+    cursor: pointer;
+    font-size: 1.2em;
+    z-index: 999; /* Sidebar'ın altında kalır */
+    box-shadow: var(--shadow-light);
+    transition: left var(--transition-normal);
+}
+
+/* Playlist açıkken tutacağı konumlandır */
+#playlist.active + #playlist-toggle-handle {
+    left: calc(-40px - var(--playlist-width)); /* Playlist açıkken sidebar'ın soluna taşı */
+    transform: translateY(-50%) rotate(0deg); /* Eski pozisyonuna döndür */
+}
+
+/* Playlist açma/kapama düğmesi için SVG ikon stilleri */
+#playlist-toggle-handle svg {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+}
+
+/* Search input */
+.playlist-selector-container {
+    margin-bottom: 15px;
+    position: sticky;
+    top: 55px; /* Playlist header'ın altında kalması için */
+    background-color: var(--bg-secondary);
+    z-index: 9;
+    padding-bottom: 10px;
+    margin-bottom: 0; /* Alt boşluğu sıfırla */
+}
+
+.playlist-selector-wrapper {
     display: flex;
-    gap: 4px;
-    opacity: 0;
-    transition: opacity var(--transition-fast);
+    flex-direction: column;
+    gap: 10px;
 }
 
-#playlist li.channel-item:hover .channel-buttons {
-    opacity: 1;
+#playlist-search {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-small);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-size: 1em;
+    outline: none;
+    transition: border-color var(--transition-fast);
 }
 
-.channel-btn {
-    background: #444;
-    color: #777;
+#playlist-search:focus {
+    border-color: var(--accent-blue);
+}
+
+/* Select element for playlists */
+#playlist-selector {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-small);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-size: 1em;
+    outline: none;
+    appearance: none; /* Varsayılan select stilini kaldır */
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%23f4f4f4%22%20d%3D%22M287%20197.6c-3.2-3.2-8.3-3.2-11.5%200l-132%20132c-3.2%203.2-8.3%203.2-11.5%200l-132-132c-3.2-3.2-8.3-3.2-11.5%200-3.2%203.2-3.2%208.3%200%2011.5l132%20132c4.8%204.8%2012.5%204.8%2017.3%200l132-132c3.2-3.2%203.2-8.3%200-11.5z%22%2F%3E%3C%2Fsvg%3E'); /* Özel ok ikonu */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+}
+
+#playlist-selector:focus {
+    border-color: var(--accent-blue);
+}
+
+/* Button Styles */
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap; /* Küçük ekranlarda düğmeleri sar */
+    justify-content: center;
+}
+
+button {
+    padding: 10px 15px;
     border: none;
     border-radius: var(--border-radius-small);
-    padding: 6px;
     cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
     display: flex;
     align-items: center;
+    gap: 5px;
     justify-content: center;
-    transition: all var(--transition-fast);
-    width: 26px;
-    height: 26px;
-    opacity: 0.7;
 }
 
-.channel-btn:hover {
-    background: var(--border-hover);
-    color: #999;
-    opacity: 1;
+button.primary {
+    background-color: var(--accent-blue);
+    color: #fff;
 }
 
-.channel-btn:active {
-    background: var(--border-color);
+button.primary:hover {
+    background-color: var(--accent-blue-hover);
+    transform: translateY(-2px);
 }
 
-.edit-btn:hover {
-    color: var(--accent-blue);
-}
-
-.delete-btn:hover {
-    color: var(--accent-red);
-}
-
-/* Group Headers */
-#playlist li.group-header {
-    background-color: transparent;
-    color: var(--text-disabled);
-    font-weight: 600;
-    margin-top: 20px;
-    margin-bottom: 8px;
-    padding: 8px 0 8px 15px;
-    border: none;
-    border-bottom: 1px solid var(--border-color);
-    cursor: default;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-left: none;
-    contain: layout style;
-}
-
-#playlist li.group-header:hover {
-    background-color: transparent;
-    color: var(--text-disabled);
-    border-left: none;
-}
-
-/* Toggle Handle */
-#playlist-toggle-handle {
-    position: fixed;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 60px;
-    background-color: var(--bg-secondary);
+button.secondary {
+    background-color: var(--bg-dark);
     color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 1001;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-    transition: left var(--transition-normal);
-    box-shadow: 2px 0 5px var(--shadow-light);
+    border: 1px solid var(--border-color);
 }
 
-#playlist-toggle-handle span {
-    display: block;
-    width: 8px;
-    height: 8px;
-    border-left: 2px solid var(--text-primary);
-    border-bottom: 2px solid var(--text-primary);
-    transform: rotate(225deg);
-    transition: transform var(--transition-normal);
+button.secondary:hover {
+    background-color: var(--border-hover);
+    transform: translateY(-2px);
 }
 
-body.playlist-visible #playlist-toggle-handle {
-    left: var(--playlist-width);
+button.danger {
+    background-color: var(--accent-red);
+    color: #fff;
 }
 
-body.playlist-visible #playlist-toggle-handle span {
-    transform: rotate(45deg);
+button.danger:hover {
+    background-color: darken(var(--accent-red), 10%); /* Hover rengi için darken */
+    transform: translateY(-2px);
 }
 
-/* Modal Styles */
+/* Upload Modal Styles */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 2000;
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 2000; /* Sit on top */
     left: 0;
-    top: -130px;
-    width: 100%;
-    height: 100%;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px); /* Arka planı bulanıklaştır */
 }
 
 .modal-content {
     background-color: var(--bg-secondary);
-    margin: 15% auto;
-    border-radius: 8px;
-    width: 85%;
-    max-width: 420px;
-    box-shadow: 0 4px 20px var(--shadow-heavy);
+    margin: auto;
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-heavy);
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    animation: fadeIn 0.3s ease-out;
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 18px;
-    border-bottom: 1px solid var(--border-hover);
-}
-
-.modal-header h3 {
-    margin: 0;
-    color: var(--text-primary);
-}
-
-.close {
-    color: #aaa;
+.close, .close-rename, .close-info {
+    color: var(--text-muted);
+    position: absolute;
+    top: 10px;
+    right: 15px;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-    line-height: 1;
+    transition: color var(--transition-fast);
 }
 
-.close:hover {
+.close:hover,
+.close:focus,
+.close-rename:hover,
+.close-rename:focus,
+.close-info:hover,
+.close-info:focus {
     color: var(--text-primary);
 }
 
-.modal-body {
-    padding: 18px;
-}
-
-/* Form Elements */
-#playlist-name,
-#new-playlist-name {
-    width: 100%;
-    padding: 8px 10px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-hover);
-    border-radius: var(--border-radius-small);
-    background-color: var(--border-color);
+.modal-content h3 {
+    margin-top: 0;
     color: var(--text-primary);
-    font-size: 0.9rem;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
-#playlist-name::placeholder,
-#new-playlist-name::placeholder {
-    color: #bbb;
-}
-
-.upload-options {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.upload-option {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.upload-option label {
-    color: var(--text-primary);
-    font-weight: bold;
-}
-
-.upload-option input[type="file"],
-.upload-option input[type="url"],
-.upload-option textarea {
-    padding: 8px 10px;
-    border: 1px solid var(--border-hover);
-    border-radius: var(--border-radius-small);
-    background-color: var(--border-color);
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    font-family: inherit;
-    resize: vertical;
-    width: 100%;
-}
-
-.upload-option input[type="url"]::placeholder,
-.upload-option textarea::placeholder {
-    color: #bbb;
-}
-
-.upload-option small {
-    color: #999;
-    font-size: 0.75rem;
-    margin-top: 3px;
+.modal-content label {
     display: block;
-    line-height: 1.2;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-size: 0.95em;
 }
 
-/* Buttons */
-.upload-option button,
-#load-url {
-    background-color: var(--accent-blue);
-    color: white;
-    border: none;
-    border-radius: var(--border-radius-small);
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color var(--transition-normal), opacity var(--transition-normal);
-}
-
-.upload-option button:hover:not(:disabled),
-#load-url:hover:not(:disabled) {
-    background-color: var(--accent-blue-hover);
-}
-
-.upload-option button:disabled,
-#load-url:disabled {
-    background-color: #666;
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-#load-url {
-    background-color: #007bff;
-}
-
-#load-url:hover:not(:disabled) {
-    background-color: #0056b3;
-}
-
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-}
-
-.modal-buttons button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: var(--border-radius-small);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color var(--transition-normal);
-}
-
-#save-rename-btn {
-    background-color: #007bff;
-    color: white;
-}
-
-#save-rename-btn:hover {
-    background-color: #0056b3;
-}
-
-#cancel-rename-btn {
-    background-color: #6c757d;
-    color: white;
-}
-
-#cancel-rename-btn:hover {
-    background-color: #545b62;
-}
-
-/* Animations */
-@keyframes pulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
-}
-
-.loading-item {
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-/* Drag & Drop */
-body.drag-over {
-    background-color: rgba(74, 158, 255, 0.1);
-}
-
-body.drag-over::before {
-    content: 'Dosyaları buraya bırakın';
-    position: fixed;
-    top: 0;
-    left: 0;
+.modal-content input[type="text"],
+.modal-content input[type="file"],
+.modal-content textarea {
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: var(--accent-blue);
-    font-size: 2rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    pointer-events: none;
-    border: 3px dashed var(--accent-blue);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .container {
-        padding: 0;
-    }
-
-    /* Portrait Orientation */
-    @media (orientation: portrait) {
-        .main-content {
-            flex-direction: column;
-            padding: 5px;
-        }
-
-        .video-js {
-            width: 100%;
-            height: calc(50vh - 15px);
-            margin: 0 0 10px;
-            order: 1;
-        }
-
-        body.playlist-visible .main-content .video-js {
-            margin-left: 0;
-        }
-
-        #playlist {
-            width: 100%;
-            position: static;
-            height: calc(50vh - 25px);
-            transform: none;
-            opacity: 1;
-            margin: 5px 0 30px;
-            order: 2;
-        }
-
-        body.playlist-visible #playlist {
-            transform: none;
-            opacity: 1;
-        }
-
-        #playlist-toggle-handle {
-            display: none;
-        }
-
-        .modal {
-            width: 100vw;
-            height: 100vh;
-            max-width: none;
-            max-height: none;
-            margin: 0;
-            border-radius: 0;
-            top: -55px;
-            left: 0;
-        }
-
-        .modal-content {
-            height: 100%;
-            padding: 20px;
-            overflow-y: auto;
-        }
-    }
-
-    /* Landscape Orientation */
-    @media (orientation: landscape) {
-        .main-content {
-            flex-direction: row;
-            padding: 5px;
-        }
-
-        .video-js {
-            flex: 1;
-            height: calc(100vh - 65px);
-            margin: 0;
-            order: 2;
-        }
-
-        body.playlist-visible .main-content .video-js {
-            margin-left: var(--playlist-width);
-        }
-
-        body.fullscreen-transition.playlist-visible .main-content .video-js {
-            transition: none !important;
-        }
-
-        #playlist {
-            width: var(--playlist-width);
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: calc(100vh - 59.9px);
-            transform: translateX(-100%);
-            opacity: 0;
-            transition: transform var(--transition-normal), opacity var(--transition-normal);
-            z-index: 1000;
-            margin-top: 0;
-            order: 1;
-        }
-
-        body.playlist-visible #playlist {
-            transform: translateX(0);
-            opacity: 1;
-        }
-
-        .modal {
-            width: 100vw;
-            height: 100vh;
-            max-width: none;
-            max-height: none;
-            margin: 0;
-            border-radius: 0;
-            top: -100px;
-            left: 0;
-        }
-
-        .modal-content {
-            height: 100%;
-            padding: 20px;
-            overflow-y: auto;
-        }
-    }
-}
-
-/* Focus stilleri */
-#playlist li:focus {
-    outline: 2px solid var(--accent-blue);
-    background-color: var(--bg-tertiary);
-}
-
-.video-js:focus {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-small);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-size: 1em;
     outline: none;
+    transition: border-color var(--transition-fast);
 }
 
-/* Video.js border removal */
-.video-js *,
-.video-js *:focus,
-.video-js *:active,
-.video-js .vjs-control-bar,
-.video-js .vjs-big-play-button,
-.video-js .vjs-play-control,
-.video-js .vjs-volume-control,
-.video-js .vjs-progress-control,
-.video-js .vjs-time-control,
-.video-js .vjs-fullscreen-control,
-.video-js .vjs-button,
-.video-js .vjs-slider {
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
+.modal-content input[type="text"]:focus,
+.modal-content textarea:focus {
+    border-color: var(--accent-blue);
+}
+
+.modal-content textarea {
+    resize: vertical; /* Sadece dikey olarak boyutlandırmaya izin ver */
+    min-height: 80px;
+}
+
+.modal-content .button-group {
+    margin-top: 20px;
+    justify-content: flex-end;
 }
 
 /* Info Modal Styles */
 .info-modal-content {
-    max-width: 500px;
-    width: 90%;
+    max-width: 600px;
 }
 
-.info-modal-body {
-    padding: 20px;
+.info-modal-content h3 {
+    margin-bottom: 10px;
 }
 
-.keyboard-shortcuts-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-}
-
-.shortcuts-section h4 {
-    margin: 0 0 12px 0;
-    color: var(--accent-blue);
-    font-size: 0.9rem;
-    font-weight: 600;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 6px;
+.info-modal-content h5 {
+    margin-top: 20px;
+    margin-bottom: 5px;
+    color: var(--text-primary);
+    font-size: 1.1em;
 }
 
 .shortcut-item {
+    background-color: var(--bg-dark);
+    padding: 10px 15px;
+    border-radius: var(--border-radius-small);
+    margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.shortcut-item:last-child {
-    border-bottom: none;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .shortcut-item .key {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    padding: 4px 8px;
+    font-weight: bold;
+    color: var(--accent-blue);
+    background-color: rgba(74, 158, 255, 0.2);
+    padding: 5px 8px;
     border-radius: var(--border-radius-small);
-    font-family: monospace;
-    font-size: 0.8rem;
-    font-weight: 600;
-    border: 1px solid var(--border-color);
-    min-width: 60px;
-    text-align: center;
-    white-space: nowrap;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .shortcut-item .description {
+    flex-grow: 1;
     color: var(--text-secondary);
-    font-size: 0.85rem;
-    flex: 1;
-    margin-left: 12px;
+    font-size: 0.9em;
+    line-height: 1.4;
 }
 
-/* Desktop Styles */
-@media (min-width: 769px) {
-    body.playlist-visible .main-content .video-js {
-        margin-left: var(--playlist-width);
-    }
-
-    body.fullscreen-transition.playlist-visible .main-content .video-js {
-        transition: none !important;
-    }
-
-    #playlist-toggle-handle {
-        display: flex;
-    }
-
-    .keyboard-shortcuts-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 25px;
-    }
+.info-button-header {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+    padding: 5px;
+    margin: 0;
 }
 
-/* Mobile Styles */
-@media (max-width: 768px) {
-    .info-modal-content {
-        margin: 10% auto;
-        width: 95%;
-        max-width: none;
-    }
-
-    .info-modal-body {
-        padding: 15px;
-    }
-
-    .shortcuts-section h4 {
-        font-size: 0.85rem;
-    }
-
-    .shortcut-item .key {
-        min-width: 50px;
-        font-size: 0.75rem;
-        padding: 3px 6px;
-    }
-
-    .shortcut-item .description {
-        font-size: 0.8rem;
-        margin-left: 8px;
-    }
+.info-button-header:hover {
+    color: var(--text-primary);
 }
 
-/* Mobile Landscape Styles */
-@media (max-width: 768px) and (orientation: landscape) {
-    .info-modal-content {
-        margin: 11% auto;
-        width: 100%;
-        max-width: 100%;
-    }
+.info-button-header svg {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
 
-    .info-modal-body {
-        padding: 12px;
-    }
-
-    .keyboard-shortcuts-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-    }
-
-    .shortcuts-section h4 {
-        font-size: 0.8rem;
-        margin-bottom: 8px;
-    }
-
-    .shortcut-item {
-        padding: 6px 0;
-    }
-
-    .shortcut-item .key {
-        min-width: 45px;
-        font-size: 0.7rem;
-        padding: 2px 4px;
-    }
-
-    .shortcut-item .description {
-        font-size: 0.75rem;
-        margin-left: 6px;
-    }
+/* No Source Message */
+#no-source-message {
+    color: var(--text-muted);
+    font-size: 1.2em;
+    text-align: center;
+    margin-top: 50px;
 }
 
 /* Volume Indicator */
 .volume-indicator {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
+    position: absolute;
+    bottom: 20%; /* Oynatıcının altından yukarıda konumlandır */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
     padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-    z-index: 100000;
-    animation: fadeInOut 2s ease-in-out;
+    border-radius: var(--border-radius);
+    font-size: 1.2em;
+    z-index: 10000; /* Her şeyin üstünde olmasını sağla */
+    pointer-events: none; /* Tıklama olaylarını engelle */
+    opacity: 0; /* Başlangıçta gizle */
+    animation: fadeInOut 1.5s forwards; /* Animasyonu uygula */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
     max-width: 300px;
@@ -1013,10 +537,15 @@ body.drag-over::before {
 
 /* Animasyonlar */
 @keyframes fadeInOut {
-    0% { opacity: 0; transform: translateY(-20px); }
-    10% { opacity: 1; transform: translateY(0); }
-    90% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-20px); }
+    0% { opacity: 0; transform: translateY(-20px) translateX(-50%); }
+    10% { opacity: 1; transform: translateY(0) translateX(-50%); }
+    90% { opacity: 1; transform: translateY(0) translateX(-50%); }
+    100% { opacity: 0; transform: translateY(-20px) translateX(-50%); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeOut {
@@ -1031,29 +560,106 @@ body.drag-over::before {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: rgba(74, 158, 255, 0.9);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background-color: rgba(74, 158, 255, 0.8);
     color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    cursor: pointer;
+    box-shadow: var(--shadow-light);
+    transition: background-color var(--transition-fast);
     z-index: 1000;
-    transition: all 0.3s ease;
-    opacity: 0.8;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .scroll-to-top:hover {
-    opacity: 1;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    background-color: var(--accent-blue);
 }
 
-.scroll-to-top svg {
-    transition: transform 0.3s ease;
-}
 
-.scroll-to-top:hover svg {
-    transform: translateY(-2px);
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Küçük ekranlarda dikey düzen */
+    }
+
+    .main-content {
+        padding: 10px;
+        height: auto; /* Yüksekliği otomatik yap */
+        flex-grow: 1;
+        width: 100%;
+    }
+
+    .video-js {
+        max-height: 60vh; /* Video yüksekliğini küçük ekranlarda kısıtla */
+    }
+
+    #playlist {
+        position: fixed; /* Küçük ekranlarda sabit yap */
+        width: 100%; /* Tam genişlik */
+        height: 100%; /* Tam yükseklik */
+        top: 0;
+        left: 0; /* Soldan girsin */
+        transform: translateX(-100%); /* Başlangıçta solda gizli */
+        border-left: none;
+        border-right: 1px solid var(--border-color); /* Sağda ince çizgi */
+        box-shadow: var(--shadow-heavy);
+        overflow-y: auto;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+
+    #playlist.active {
+        transform: translateX(0); /* Açıldığında içeri gel */
+    }
+
+    #playlist-toggle-handle {
+        left: auto; /* Eski konumunu sıfırla */
+        right: 10px; /* Sağda sabit bir düğme olarak konumlandır */
+        top: 10px;
+        transform: translateY(0) rotate(0deg); /* Normal pozisyonda kalır */
+        border-radius: var(--border-radius); /* Tamamen yuvarlat */
+        padding: 8px 10px;
+        z-index: 1100; /* Diğer her şeyin üstünde olmasını sağla */
+    }
+
+    #playlist.active + #playlist-toggle-handle {
+        right: calc(10px + var(--playlist-width)); /* Playlist açıkken sağa doğru it */
+        transform: translateY(0) rotate(0deg);
+    }
+
+    .playlist-header-container {
+        position: static; /* Header'ı statik yap */
+        padding-top: 0;
+        margin-top: 0;
+        border-bottom: none;
+    }
+
+    .playlist-selector-container {
+        position: static; /* Selector container'ı statik yap */
+        padding-bottom: 0;
+    }
+
+    .button-group {
+        flex-direction: column; /* Düğmeleri dikey olarak sırala */
+        align-items: stretch;
+    }
+
+    .modal-content {
+        width: 95%; /* Küçük ekranlarda modal genişliğini artır */
+        padding: 20px;
+    }
+
+    .volume-indicator {
+        bottom: 10%; /* Küçük ekranlarda biraz daha aşağı al */
+        font-size: 1em;
+        padding: 8px 15px;
+    }
+
+    @keyframes fadeInOut {
+        0% { opacity: 0; transform: translateY(-10px) translateX(-50%); }
+        10% { opacity: 1; transform: translateY(0) translateX(-50%); }
+        90% { opacity: 1; transform: translateY(0) translateX(-50%); }
+        100% { opacity: 0; transform: translateY(-10px) translateX(-50%); }
+    }
 }
