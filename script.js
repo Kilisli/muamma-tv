@@ -1,6 +1,6 @@
 const player = videojs('my-video');
 
-const defaultM3uUrl = 'https://lemonchiffon-dotterel-347603.hostingersite.com/yayin.m3u8';
+const defaultM3uUrl = 'https://mth.tc/kablotvv';
 
 const playlistElement = document.querySelector('#playlist ul');
 const playlistContainer = document.getElementById('playlist');
